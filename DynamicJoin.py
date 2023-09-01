@@ -92,7 +92,7 @@ def updateTableRequiredStatusRecursively(tablesInfoDict:dict, currentTableNameKe
 # COMMAND ----------
 
 
-def newApproach( allColumns:bool=False, columnListToSelect: list[str]=None  ):
+def newApproach( allColumns:bool=False, columnListToSelect: list[str]=None, joinTableKeyIrrespectiveOfColumnSelectedList:list[str] = []  ):
   # There would be a or join of couple of tables joined which will be starting table for our business object
   
   # vbapObject = spark.read.table("testdb.VBAP")
@@ -108,7 +108,17 @@ def newApproach( allColumns:bool=False, columnListToSelect: list[str]=None  ):
       ,"joinConditionExpresion": "STARTING_TABLE"
       ,"joinType": "STARTING_TABLE"
       ,"joinDependentOnTables":["STARTING_TABLE"]
-      ,"tableJoinSeq" : None  #UseIfNeeded
+      ,"tableJoinSeq" : 1  #UseIfNeeded
+      }
+    ,"must_join_test_table_1" : {
+      "dataframeVar" : spark.read.table( "testdb.MUST_JOIN_TEST_TABLE_1" )
+      ,"alias" : "must_join_test_table_1"
+      ,"isStartingTable": False
+      ,"requiredT": False #Will update it if needed
+      ,"joinConditionExpresion" : ( col("vbak.VBELN") == col("must_join_test_table_1.VBELN")  )
+      ,"joinType": "inner"
+      ,"joinDependentOnTables":["vbap"]
+      ,"tableJoinSeq" : 4  #UseIfNeeded
       }
     ,"vbak" : {
       "dataframeVar" : spark.read.table( "testdb.VBAK" )
@@ -118,7 +128,7 @@ def newApproach( allColumns:bool=False, columnListToSelect: list[str]=None  ):
       ,"joinConditionExpresion" : ( col("vbap.VBELN") == col("vbak.VBELN")  )
       ,"joinType": "inner"
       ,"joinDependentOnTables":["vbap"]
-      ,"tableJoinSeq" : None  #UseIfNeeded
+      ,"tableJoinSeq" : 2  #UseIfNeeded
       }
     ,"vbuk" : {
       "dataframeVar" : spark.read.table( "testdb.VBUK" )
@@ -128,8 +138,18 @@ def newApproach( allColumns:bool=False, columnListToSelect: list[str]=None  ):
       ,"joinConditionExpresion" : ( col("vbap.VBELN") == col("vbuk.VBELN")  )
       ,"joinType": "left"
       ,"joinDependentOnTables":["vbap"]
-      ,"tableJoinSeq" : None  #UseIfNeeded
+      ,"tableJoinSeq" : 3  #UseIfNeeded
       }
+    # ,"must_join_test_table_1" : {
+    #   "dataframeVar" : spark.read.table( "testdb.MUST_JOIN_TEST_TABLE_1" )
+    #   ,"alias" : "must_join_test_table_1"
+    #   ,"isStartingTable": False
+    #   ,"requiredT": False #Will update it if needed
+    #   ,"joinConditionExpresion" : ( col("vbak.VBELN") == col("must_join_test_table_1.VBELN")  )
+    #   ,"joinType": "left_anti"
+    #   ,"joinDependentOnTables":["vbap"]
+    #   ,"tableJoinSeq" : None  #UseIfNeeded
+    #   }
     }
 
 
@@ -184,10 +204,19 @@ def newApproach( allColumns:bool=False, columnListToSelect: list[str]=None  ):
     #Will add the expression for thr column to the list
     requiredColumnsSelectExprList.append( columnsInfoDict[colNameKey]["expr"].alias( colNameKey )  ) 
   
+
+  #Step 3-There will be scenarios where we must need to join a table irrespective of any columns selected or not. For one example there is a table and we are doing left anti join on it. So in this case we won't be selecting any columns from, we can't set the required flag for the table from columnsInfoDict. So we are having an argument in the function  joinTableKeyIrrespectiveOfColumnSelectedList. Will iterate on this list and set the required status flag for the table.
+  for tabNameItr in joinTableKeyIrrespectiveOfColumnSelectedList:
+    tablesInfoDict[tabNameItr]["requiredT"] = True 
+
   print( requiredColumnsSelectExprList  )
   printTableInfoDictStatus( tablesInfoDict )
  
-  # Step 3- To join the only required tables and keep it in a intermediate expression
+  # Step 4- To join the only required tables and keep it in a intermediate expression
+  # First we will sort the tables  key in ascending sequence no as in dictionary they can appear in any order (although in python the sequence in dict is reserved)
+  tableNameKeyInAcsendingSeqOrder = [ (tabNameKey, tablesInfoDict[tabNameKey]["tableJoinSeq"]) for tabNameKey in tablesInfoDict  ]  #Here it is not in ascending order but in next step we are sorting
+  tableNameKeyInAcsendingSeqOrder.sort( key = lambda x: x[1] )
+
   startingTableKey = None   #Either we can write it manually otherwise we can generate from info Dict... Info dict is seeming better to extract from 
   for tabNameKey in tablesInfoDict:
     if tablesInfoDict[tabNameKey]["isStartingTable"]:
@@ -198,7 +227,7 @@ def newApproach( allColumns:bool=False, columnListToSelect: list[str]=None  ):
                                  )  #will start from the starting table
  
   #Will iterate for other required tables join
-  for tabNameKey in tablesInfoDict:
+  for tabNameKey, _ in tableNameKeyInAcsendingSeqOrder:
     if (startingTableKey == tabNameKey) or ( not tablesInfoDict[tabNameKey]["requiredT"] ):
       continue #As starting table is already in the join expression and joins for not required columns is not needed
     
@@ -213,12 +242,19 @@ def newApproach( allColumns:bool=False, columnListToSelect: list[str]=None  ):
 
 # COMMAND ----------
 
-# heheDf = newApproach( allColumns =  True )
+heheDf = newApproach( allColumns =  True, joinTableKeyIrrespectiveOfColumnSelectedList = ["must_join_test_table_1"] )
+heheDf.display()
 
 # COMMAND ----------
 
 selectedColDf = newApproach( columnListToSelect =  ["CRT_DT_ITM", "CRT_DT_HDR"] )
 selectedColDf.display()
+
+# COMMAND ----------
+
+vv = ["d", "a", "c"]
+vv.sort( key = lambda x : x )
+print(vv)
 
 # COMMAND ----------
 
@@ -233,27 +269,18 @@ selectedColDf.display()
 
 # COMMAND ----------
 
-spark.read.table.
-
-# COMMAND ----------
-
-for x in t.keys():
-  print( x )
-
-# COMMAND ----------
-
-for y in t:
-  print( y )
-
-# COMMAND ----------
-
-tdf = spark.sql("select 1")
-bdf = spark.sql("select 1")
+Title
+-------
+Dynamically join only required tables depending upon the columns needed. 
+Benifits
+--------
+  -> The business logic will be kept at once place so less repeating the code
+  -> Increased performance as only required tables will be read and joined
 
 
-# COMMAND ----------
+Leverage the flexibility of pyspark api to perform dynamic join. 
 
-tdf.join( other= bdf, on=lit(True), how="left" )
+Jau dictionary re each variable ra meaning bujhei dabu au function argument re kn kn patha hauchi seta kemit use haba bujhei dabu
 
-# COMMAND ----------
+Taa pare code ra github link au databricks ra dbc format re extract kari rakhi debu
 
