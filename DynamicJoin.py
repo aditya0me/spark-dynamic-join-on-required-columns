@@ -10,17 +10,10 @@ import copy
 # COMMAND ----------
 
 
-def newApproach( tablesInfoDict:dict, columnsInfoDict:dict, columnListToSelect: list[str]=None, allColumns:bool=False, 
+def joinTablesAndSelectExprDynamically( tablesInfoDict:dict, columnsInfoDict:dict, columnListToSelect: list[str]=None, allColumns:bool=False, 
 joinTableKeyIrrespectiveOfColumnSelectedList:list[str] = []  ):
   
-  # There would be a or join of couple of tables joined which will be starting table for our business object
-  
-  # vbapObject = spark.read.table("testdb.VBAP")
-  # startingTablesJoinedDf = (
-  #   vbapObject.alias("vbap")
-  # )
-  
- 
+  #Step 1 - Can call the validation functions here, so that they if the tablesInfo and columnsInfo is not given properly we will fail them with a good error message so that it can be caught easily
 
 
   # Step 2- Now to generate the select expression of required columns, for this i) we wll update their required status ii)and also in the way update the required status of tables iii) generate the select expression in a list
