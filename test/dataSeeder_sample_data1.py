@@ -75,7 +75,7 @@ if dbFolderExists:
 
 # COMMAND ----------
 
-dbutils.notebook.exit()
+dbutils.notebook.exit("end")
 
 # COMMAND ----------
 
