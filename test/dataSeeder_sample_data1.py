@@ -28,6 +28,7 @@ except Exception as e:
 
 
 if dbFolderExists:
+  print("Removing the database folder")
   dbutils.fs.rm( dbBasePath, True )
 
 # COMMAND ----------
@@ -74,7 +75,7 @@ if dbFolderExists:
 
 # COMMAND ----------
 
-dbutils.notebook.exit()
+dbutils.notebook.exit("end")
 
 # COMMAND ----------
 
