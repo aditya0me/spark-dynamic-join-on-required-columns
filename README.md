@@ -43,7 +43,8 @@ ordersReqColumnsDf = ordersDf.select("OrderNum", "QtyOrdered", "BillingAddress")
 ordersReqColumnsDf.show()
 ```
 
-If you see the physical plan for the above spark action, here even though we are not selecting any Delivery table colummn but it (Delivery) table will be read and joined. All though spark is intelligent enough to only read *order_no* column from Delivery table and won't read the delivery_address column as it is not needed anywhere, but at least the join operation has to be performed as it is there in the expression. 
+If you see the physical plan for the above spark action, here even though we are not selecting any Delivery table colummn but it (Delivery) table will be read and joined. All though spark is intelligent enough to only read *order_no* column from Delivery table and won't read the delivery_address column as it is not needed anywhere, but at least the join operation has to be performed as it is there in the expression.
+
 ![Joining all the tables and selecting column spark plan in version 3.4.1 on sample dataset](/assets/images/example_0_direct_join_spark_plan_3.4.1.png)<br>*Joining all the tables and selecting column spark plan in version 3.4.1 on sample small dataset*
 
 ## New Approach
@@ -116,7 +117,8 @@ columnsToSelect = [ "OrderNum", "QtyOrdered", "BillingAddress" ]
 ordersReqColumnsDf = joinTablesAndSelectExprDynamically(tablesInfoDict, columnsInfoDict, columnListToSelect = columnsToSelect )
 ordersReqColumnsDf.show()
 ```
-If you see the physical plan for the spark action in new approach, you will see the Delivery table is not being joined as only Billing table column is used. 
+If you see the physical plan for the spark action in new approach, you will see the Delivery table is not being joined as only Billing table column is used.
+
 ![New approach spark plan in version 3.4.1 on sample small dataset](/assets/images/example_0_new_approach_function_join_spark_plan_3.4.1.png)<br>*New approach spark plan in version 3.4.1 on sample small dataset*
 
 ## Ending note - Scenarios supporting this approach
