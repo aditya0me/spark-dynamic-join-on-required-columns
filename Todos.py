@@ -9,7 +9,7 @@ Kau column paen jadi kichi window function herika darkar thiba tahele upare gote
 -> I know at this point of time it won;t be made generic for all possible scenarios but it's fine gudu if it help one person or only me also then also it is fine, no problem in it. 
 
 -> make various validation functions for the tablesInfoDict and columnsInfoDict. For example 
-  ->
+  -> No more thoughts till now
 Below i don't have that knowledge to do
 -> join type string should be on of the valid strings, should we use the enum class here or it will be over engineering for now 
 -> Table ra join condition expresssion kimba column expression re emiti kichi alias use heichi ki jauta tablesInfoDict re hi nahi. i don;t know right now how to extract the alias names from the pyspark expression or not. If i can extract it i can also 
