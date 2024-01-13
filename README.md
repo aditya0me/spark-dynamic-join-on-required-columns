@@ -2,7 +2,8 @@
 Right now the python files this repository is having are actually datbricks notebooks. I am using the communtiy edition datbricks which is free to use, experiment and learning.<br>Although the python files are datbarick notebooks, the function can definitely be used in other spark environment. Will change that into normal python format in future changes.
 
 ## Problem statement this solves
-Let's discuss how this will help with an example. The example I am going to discuss here is present in the examples folder with name as examples_0. Let's say we have 3 tables with schema as - 
+Let's discuss how this will help with an example. The example I am going to discuss here is present in the examples folder with name as example_0. And you can also go through the files in the order [example_0_data_seeder](/examples/example_0_data_seeder.py), [example_0_direct_approach](/examples/example_0_direct_approach.py), [example_0_function_usage_demo](/examples/example_0_function_usage_demo.py).<br>That is being discussed here also. 
+Let's say we have 3 tables with schema as - 
 - Orders(order_no : string, order_qty : int, order_creation_date : date)
 - Delivery(order_no : string, delivery_address : string)
 - Billing(order_no : string, billing_address : string) 
